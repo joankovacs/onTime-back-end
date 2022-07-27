@@ -17,5 +17,7 @@ def create_app(test_config=None):
 
     from .routes import routine_bp
     app.register_blueprint(routine_bp)
+    from .routes import task_bp
+    app.register_blueprint(task_bp)
 
     return app
