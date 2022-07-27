@@ -89,6 +89,22 @@ def delete_routine(routine_id):
     return {"message":f'Routine {routine_id} successfully deleted'}, 200
 
 
+@routine_bp.route("/<routine_id>", methods=["PUT"])
+def update_routine(routine_id):
+    routine = validate_id(routine_id, "routine")
+    request_body = request.get_json()
+
+    routine_dict = routine.__dict__
+
+    for key in dict(request_body).keys():
+        if key in routine_dict:
+            setattr(routine, key, request_body[key])
+
+    db.session.commit()
+
+    return jsonify(routine.to_dict()), 200
+
+
 
 ##### [4] TASKS ENDPOINTS ###########################################
 
@@ -141,8 +157,15 @@ def delete_one_task(task_id):
     return {"message" : f'Task {task_id} successfully deleted'}, 200
 
 
+@task_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    task = validate_id(task_id, "task")
+    request_body = request.get_json()
 
+    task.title = request_body["title"]
+    task.time = request_body["time"]
 
+    db.session.commit()
 
-
+    return jsonify(task.to_dict()), 200
 
