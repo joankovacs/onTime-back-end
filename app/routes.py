@@ -35,8 +35,11 @@ def validate_id(object_id, object_type):
 
     if object_type == "routine":
         response = Routine.query.get(object_id)
-    #elif object_type == "task":
-        #response = Task.query.get(object_id)
+    elif object_type == "task":
+        response = Task.query.get(object_id)
+    else:
+        abort(make_response({"message":f"{object_type} {object_id} not found"}, 404))
+
     if not response:
         abort(make_response({"message":f"{object_type} {object_id} not found"}, 404))
 
@@ -99,28 +102,43 @@ def get_all_tasks():
     return jsonify([task.to_dict() for task in tasks]), 200
 
 
-
-#@task_bp.route("", methods=["POST"])
-#def post_task():
-    #request_body = request.get_json()
-
-    #if "title" in request_body and "routine_id" in request_body:
-        #if len(request_body["message"]) > 40:
-            #abort(make_response({"details": "Messages cannot be longer than 40 characters"}, 400))
-        #new_card = Card(
-            #message=request_body["message"],
-            #likes_count=0,
-            #board_id=request_body["board_id"],
-            #)
-    #else:
-        #abort(make_response({"details": "Invalid data"}, 400))
-
-    #db.session.add(new_card)
-    #db.session.commit()
+@task_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task = validate_id(task_id, "task")
+    return jsonify(task.to_dict()), 200
 
 
+@task_bp.route("", methods=["POST"])
+def post_task():
+    request_body = request.get_json()
+
+    if ("title" in request_body) and ("time" in request_body) and ("routine_id" in request_body):
+        if len(request_body["title"]) > 40:
+            abort(make_response({"details": "Titles cannot be longer than 40 characters"}, 400))
+        if type(request_body["time"]) != int:
+            abort(make_response({"details": "Time must be an integer"}, 400))
+        if request_body["time"] < 1:
+            abort(make_response({"details": "Time must be an integer that is equal to 1 or more"}, 400))
+        new_task = Task(
+            title=request_body["title"],
+            time=request_body["time"],
+            routine_id=request_body["routine_id"],
+            )
+    else:
+        abort(make_response({"details": "Invalid data"}, 400))
+
+    db.session.add(new_task)
+    db.session.commit()
+
+    return make_response(new_task.to_dict(), 201)
 
 
+@task_bp.route("/<task_id>", methods=["DELETE"])
+def delete_one_task(task_id):
+    task = validate_id(task_id, "task")
+    db.session.delete(task)
+    db.session.commit()
+    return {"message" : f'Task {task_id} successfully deleted'}, 200
 
 
 

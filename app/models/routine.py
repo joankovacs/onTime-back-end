@@ -19,6 +19,6 @@ class Routine(db.Model):
             "id":self.routine_id,
             "title":self.title,
             "desc":self.description,
-            "tasks":[task.to_dict() for task in self.tasks]
+            "tasks":[task.to_routine() for task in self.tasks]
             }
 

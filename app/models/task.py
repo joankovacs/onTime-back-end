@@ -14,3 +14,13 @@ class Task(db.Model):
             "time":self.time,
             "routine id":self.routine_id
             }
+
+    def to_routine(self):
+        '''
+        returns shortened dictionary for use in the nested list in
+        the to_dict method for routines
+        '''
+        return {
+            "title":self.title,
+            "time":self.time,
+            }
