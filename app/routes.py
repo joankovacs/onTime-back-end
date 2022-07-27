@@ -72,3 +72,14 @@ def post_routine():
     db.session.commit()
 
     return make_response(new_routine.to_dict(), 201)
+
+
+@routine_bp.route("/<routine_id>", methods=["DELETE"])
+def delete_routine(routine_id):
+    #This should also delete all tasks that are part of the routine
+    routine = validate_id(routine_id, "routine")
+    #for card in board.cards:
+        #delete_one_card(card.card_id)
+    db.session.delete(routine)
+    db.session.commit()
+    return {"message":f'Routine {routine_id} successfully deleted'}, 200
