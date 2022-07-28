@@ -7,6 +7,7 @@ chardet==4.0.0
 charset-normalizer==2.0.12
 click==7.1.2
 coverage==6.3.2
+cowsay==4.0
 Flask==1.1.2
 Flask-Cors==3.0.10
 Flask-Migrate==2.6.0
@@ -20,6 +21,7 @@ Mako==1.1.4
 MarkupSafe==1.1.1
 packaging==20.9
 pluggy==0.13.1
+psycopg2==2.9.3
 psycopg2-binary==2.9.1
 py==1.10.0
 pycodestyle==2.6.0
@@ -36,3 +38,4 @@ toml==0.10.2
 tomli==2.0.1
 urllib3==1.26.4
 Werkzeug==1.0.1
+wonderwords==2.2.0
