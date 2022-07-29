@@ -77,11 +77,6 @@ def post_routine():
             if attribute in request_body:
                 setattr(new_routine, attribute, request_body[attribute])
 
-        #if "description" in request_body:
-            #new_routine.description = request_body["description"]
-
-
-
     else:
         abort(make_response({"details": "Invalid data"}, 400))
 
@@ -95,8 +90,8 @@ def post_routine():
 def delete_routine(routine_id):
     #This should also delete all tasks that are part of the routine
     routine = validate_id(routine_id, "routine")
-    for task in board.tasks:
-        delete_one_card(task.task_id)
+    for task in routine.tasks:
+        delete_one_task(task.task_id)
     db.session.delete(routine)
     db.session.commit()
     return {"message":f'Routine {routine_id} successfully deleted'}, 200
