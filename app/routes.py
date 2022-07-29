@@ -6,9 +6,6 @@ import datetime
 
 ##### TODO ##########################################################
 '''
-Add update_routine_start_time using time delta
-'''
-'''
 Add to the ROUTINE - POST and ROUTINE - PUT endpoints special parameters
 for handling data entry as a datetime object - I don't really know what
 that would look like in code.
@@ -72,7 +69,9 @@ def update_routine_start_time(routine_id):
     routine = validate_id(routine_id, "routine")
 
     if routine.complete_time:
-        pass
+        time_diff = datetime.timedelta(minutes=routine.total_time)
+        routine.start_time = complete_time - time_diff
+        db.session.commit()
 
 
 
@@ -87,6 +86,9 @@ def update_total_routine_time(routine_id):
     '''
     routine = validate_id(routine_id, "routine")
     routine.set_total_time()
+
+    update_routine_start_time(routine_id)
+
     db.session.commit()
 
 
@@ -120,6 +122,7 @@ def post_routine():
         abort(make_response({"details": "Invalid data"}, 400))
 
     db.session.add(new_routine)
+    update_routine_start_time(routine_id)
     db.session.commit()
 
     return make_response(new_routine.to_dict(), 201)
@@ -147,6 +150,7 @@ def update_routine(routine_id):
         if key in routine_dict:
             setattr(routine, key, request_body[key])
 
+    update_routine_start_time(routine_id)
     db.session.commit()
 
     return jsonify(routine.to_dict()), 200
