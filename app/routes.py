@@ -2,7 +2,17 @@ from flask import Blueprint, request, jsonify, make_response, abort
 from app import db
 from app.models.routine import Routine
 from app.models.task import Task
+import datetime
 
+##### TODO ##########################################################
+'''
+Add update_routine_start_time using time delta
+'''
+'''
+Add to the ROUTINE - POST and ROUTINE - PUT endpoints special parameters
+for handling data entry as a datetime object - I don't really know what
+that would look like in code.
+'''
 
 ##### TABLE OF CONTENTS #############################################
 
@@ -46,10 +56,39 @@ def validate_id(object_id, object_type):
     return response
 
 
+def update_routine_start_time(routine_id):
+    '''
+    If the routine [by routine id] has a complete time, this function updates the start time.
+    This function is called in endpoints where routine time information is changed.
+    The endpoints are:
+        ROUTINE: POST
+        ROUTINE: PUT
+    Additionally, this function is always called in update_total_routine_time().
+    These endpoints are:
+        TASKS: POST
+        TASKS: PUT
+        TASKS: DELETE
+    '''
+    routine = validate_id(routine_id, "routine")
+
+    if routine.complete_time:
+        pass
+
+
+
+
 def update_total_routine_time(routine_id):
+    '''
+    This function is called in endpoints where the tasks in a routine change in any way.
+    The endpoints are:
+        TASKS: POST
+        TASKS: PUT
+        TASKS: DELETE
+    '''
     routine = validate_id(routine_id, "routine")
     routine.set_total_time()
     db.session.commit()
+
 
 ##### [3] ROUTINE ENDPOINTS #########################################
 
