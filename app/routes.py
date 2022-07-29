@@ -70,10 +70,8 @@ def update_routine_start_time(routine_id):
 
     if routine.complete_time:
         time_diff = datetime.timedelta(minutes=routine.total_time)
-        routine.start_time = complete_time - time_diff
+        routine.start_time = routine.complete_time - time_diff
         db.session.commit()
-
-
 
 
 def update_total_routine_time(routine_id):
@@ -90,6 +88,24 @@ def update_total_routine_time(routine_id):
     update_routine_start_time(routine_id)
 
     db.session.commit()
+
+
+def dict_to_datetime(time):
+    '''
+    Given a dict with 5 time fields, this returns a datetime object
+    This function runs in the following endpoints:
+        Routine PUT
+        Routine POST
+    '''
+    time = datetime.datetime(
+        year=time["year"],
+        month=time["month"],
+        day=time["day"],
+        hour=time["hour"],
+        minute=time["minute"]
+    )
+    return time
+
 
 
 ##### [3] ROUTINE ENDPOINTS #########################################
@@ -116,7 +132,10 @@ def post_routine():
         attr_list = ["description", "destination", "complete_time", "start_time", "total_time", "saved"]
         for attribute in attr_list:
             if attribute in request_body:
-                setattr(new_routine, attribute, request_body[attribute])
+                if attribute == "complete_time":
+                    setattr(new_routine, "complete_time", dict_to_datetime(request_body["complete_time"]))
+                else:
+                    setattr(new_routine, attribute, request_body[attribute])
 
     else:
         abort(make_response({"details": "Invalid data"}, 400))
@@ -148,7 +167,10 @@ def update_routine(routine_id):
 
     for key in dict(request_body):
         if key in routine_dict:
-            setattr(routine, key, request_body[key])
+            if key == "complete_time":
+                setattr(routine, "complete_time", dict_to_datetime(request_body["complete_time"]))
+            else:
+                setattr(routine, key, request_body[key])
 
     update_routine_start_time(routine_id)
     db.session.commit()
