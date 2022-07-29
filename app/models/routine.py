@@ -16,9 +16,9 @@ class Routine(db.Model):
 
     def to_dict(self):
         return {
-            "id":self.routine_id,
+            "routine_id":self.routine_id,
             "title":self.title,
-            "desc":self.description,
+            "description":self.description,
             "tasks":[task.to_routine() for task in self.tasks]
             }
 
