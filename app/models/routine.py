@@ -19,6 +19,9 @@ class Routine(db.Model):
             "routine_id":self.routine_id,
             "title":self.title,
             "description":self.description,
+            "destination": self.destination,
+            "complete_time": self.complete_time,
+            "start_time": self.complete_time,
             "tasks":[task.to_routine() for task in self.tasks]
             }
-
+            

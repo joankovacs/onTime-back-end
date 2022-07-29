@@ -9,10 +9,10 @@ class Task(db.Model):
 
     def to_dict(self):
         return {
-            "id":self.task_id,
+            "task_id":self.task_id,
             "title":self.title,
             "time":self.time,
-            "routine id":self.routine_id
+            "routine_id":self.routine_id
             }
 
     def to_routine(self):
