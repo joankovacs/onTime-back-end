@@ -24,7 +24,7 @@ class Routine(db.Model):
             "start_time": self.start_time,
             "total_time":self.total_time,
 
-            "tasks":[task.to_routine() for task in self.tasks]
+            "tasks":[task.to_dict() for task in self.tasks]
             }
 
     def set_total_time(self):
