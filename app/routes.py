@@ -64,11 +64,19 @@ def get_one_routine(routine_id):
 def post_routine():
     request_body = request.get_json()
 
-    if "title" in request_body and "description" in request_body:
-        new_routine = Routine(
-            title=request_body["title"],
-            description=request_body["description"],
-            )
+    if "title" in request_body:
+        new_routine = Routine(title=request_body["title"])
+
+        attr_list = ["description", "destination", "complete_time", "start_time", "total_time", "saved"]
+        for attribute in attr_list:
+            if attribute in request_body:
+                setattr(new_routine, attribute, request_body[attribute])
+
+        #if "description" in request_body:
+            #new_routine.description = request_body["description"]
+
+
+
     else:
         abort(make_response({"details": "Invalid data"}, 400))
 
@@ -96,7 +104,7 @@ def update_routine(routine_id):
 
     routine_dict = routine.__dict__
 
-    for key in dict(request_body).keys():
+    for key in dict(request_body):
         if key in routine_dict:
             setattr(routine, key, request_body[key])
 
