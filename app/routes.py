@@ -46,6 +46,11 @@ def validate_id(object_id, object_type):
     return response
 
 
+def update_total_routine_time(routine_id):
+    routine = validate_id(routine_id, "routine")
+    routine.set_total_time()
+    db.session.commit()
+
 ##### [3] ROUTINE ENDPOINTS #########################################
 
 @routine_bp.route("", methods=["GET"])
@@ -90,8 +95,8 @@ def post_routine():
 def delete_routine(routine_id):
     #This should also delete all tasks that are part of the routine
     routine = validate_id(routine_id, "routine")
-    #for card in board.cards:
-        #delete_one_card(card.card_id)
+    for task in board.tasks:
+        delete_one_card(task.task_id)
     db.session.delete(routine)
     db.session.commit()
     return {"message":f'Routine {routine_id} successfully deleted'}, 200
@@ -152,6 +157,7 @@ def post_task():
         abort(make_response({"details": "Invalid data"}, 400))
 
     db.session.add(new_task)
+    update_total_routine_time(request_body["routine_id"])
     db.session.commit()
 
     return make_response(new_task.to_dict(), 201)
@@ -161,6 +167,7 @@ def post_task():
 def delete_one_task(task_id):
     task = validate_id(task_id, "task")
     db.session.delete(task)
+    update_total_routine_time(request_body["routine_id"])
     db.session.commit()
     return {"message" : f'Task {task_id} successfully deleted'}, 200
 
@@ -173,6 +180,7 @@ def update_task(task_id):
     task.title = request_body["title"]
     task.time = request_body["time"]
 
+    update_total_routine_time(request_body["routine_id"])
     db.session.commit()
 
     return jsonify(task.to_dict()), 200

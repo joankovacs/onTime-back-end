@@ -8,9 +8,8 @@ class Routine(db.Model):
 
     complete_time = db.Column(db.DateTime)
     start_time = db.Column(db.DateTime)  #Calculated from complete time
-    total_time = db.Column(db.Integer) #<< number of minutes, calculated
+    total_time = db.Column(db.Integer, default=0) #<< number of minutes, calculated
 
-    saved = db.Column(db.Boolean) #defaults to True
     tasks = db.relationship("Task", back_populates="routine", lazy=True)
 
 
@@ -25,7 +24,12 @@ class Routine(db.Model):
             "start_time": self.start_time,
             "total_time":self.total_time,
 
-            "saved":self.saved,
             "tasks":[task.to_routine() for task in self.tasks]
             }
+
+    def set_total_time(self):
+        '''
+        Method should run in endpoints any time the task list changes
+        '''
+        self.total_time = sum([task.time for task in self.tasks])
             
