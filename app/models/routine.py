@@ -12,6 +12,16 @@ class Routine(db.Model):
 
     tasks = db.relationship("Task", back_populates="routine", lazy=True)
 
+    def datetime_to_dict(self, dt):
+        #For making a dictionary out of a datetime object to make front end simple
+        return {
+            "year":dt.year,
+            "month":dt.month,
+            "day":dt.day,
+            "hour":dt.hour,
+            "minute":dt.minute,
+            "second":dt.second,
+            }
 
     def to_dict(self):
         return {

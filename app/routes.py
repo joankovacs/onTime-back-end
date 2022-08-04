@@ -5,11 +5,7 @@ from app.models.task import Task
 import datetime
 
 ##### TODO ##########################################################
-'''
-Add to the ROUTINE - POST and ROUTINE - PUT endpoints special parameters
-for handling data entry as a datetime object - I don't really know what
-that would look like in code.
-'''
+
 
 ##### TABLE OF CONTENTS #############################################
 
