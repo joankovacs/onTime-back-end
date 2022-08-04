@@ -30,8 +30,8 @@ class Routine(db.Model):
             "description":self.description,
             "destination": self.destination,
 
-            "complete_time": self.complete_time,
-            "start_time": self.start_time,
+            "complete_time": datetime_to_dict(self.complete_time),
+            "start_time": datetime_to_dict(self.start_time),
             "total_time":self.total_time,
 
             "tasks":[task.to_dict() for task in self.tasks]
