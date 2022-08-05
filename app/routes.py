@@ -93,10 +93,12 @@ def dict_to_datetime(time):
         Routine PUT
         Routine POST
     '''
+    now = datetime.datetime.today()
+
     time = datetime.datetime(
-        year=time["year"],
-        month=time["month"],
-        day=time["day"],
+        year=now.year,
+        month=now.month,
+        day=now.day,
         hour=time["hour"],
         minute=time["minute"]
     )
