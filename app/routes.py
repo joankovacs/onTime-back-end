@@ -5,8 +5,6 @@ from app.models.task import Task
 import datetime
 
 ##### TODO ##########################################################
-# Make the post routine work?? It is throwing the error "routine None invalid", 
-# which is on line 38, but we aren't calling that in the function!!!
 
 
 ##### TABLE OF CONTENTS #############################################
