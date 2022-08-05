@@ -5,6 +5,8 @@ from app.models.task import Task
 import datetime
 
 ##### TODO ##########################################################
+# Make the post routine work?? It is throwing the error "routine None invalid", 
+# which is on line 38, but we aren't calling that in the function!!!
 
 
 ##### TABLE OF CONTENTS #############################################
@@ -34,17 +36,17 @@ def validate_id(object_id, object_type):
     try:
         object_id = int(object_id)
     except:
-        abort(make_response({"message":f"{object_type} {object_id} invalid"}, 400))
+        abort(make_response({"details":f"{object_type} {object_id} invalid"}, 400))
 
     if object_type == "routine":
         response = Routine.query.get(object_id)
     elif object_type == "task":
         response = Task.query.get(object_id)
     else:
-        abort(make_response({"message":f"{object_type} {object_id} not found"}, 404))
+        abort(make_response({"details":f"{object_type} {object_id} not found"}, 404))
 
     if not response:
-        abort(make_response({"message":f"{object_type} {object_id} not found"}, 404))
+        abort(make_response({"details":f"{object_type} {object_id} not found"}, 404))
 
     return response
 
@@ -128,7 +130,7 @@ def post_routine():
         attr_list = ["description", "destination", "complete_time", "start_time", "total_time", "saved"]
         for attribute in attr_list:
             if attribute in request_body:
-                if attribute == "complete_time":
+                if "complete_time" == attribute:
                     setattr(new_routine, "complete_time", dict_to_datetime(request_body["complete_time"]))
                 else:
                     setattr(new_routine, attribute, request_body[attribute])
@@ -137,21 +139,11 @@ def post_routine():
         abort(make_response({"details": "Invalid data"}, 400))
 
     db.session.add(new_routine)
-    update_routine_start_time(routine_id)
     db.session.commit()
+
+    update_routine_start_time(new_routine.routine_id)
 
     return make_response(new_routine.to_dict(), 201)
-
-
-@routine_bp.route("/<routine_id>", methods=["DELETE"])
-def delete_routine(routine_id):
-    #This should also delete all tasks that are part of the routine
-    routine = validate_id(routine_id, "routine")
-    for task in routine.tasks:
-        delete_one_task(task.task_id)
-    db.session.delete(routine)
-    db.session.commit()
-    return {"message":f'Routine {routine_id} successfully deleted'}, 200
 
 
 @routine_bp.route("/<routine_id>", methods=["PUT"])
@@ -173,6 +165,16 @@ def update_routine(routine_id):
 
     return jsonify(routine.to_dict()), 200
 
+
+@routine_bp.route("/<routine_id>", methods=["DELETE"])
+def delete_routine(routine_id):
+    #This should also delete all tasks that are part of the routine
+    routine = validate_id(routine_id, "routine")
+    for task in routine.tasks:
+        delete_one_task(task.task_id)
+    db.session.delete(routine)
+    db.session.commit()
+    return {"details":f'Routine {routine_id} successfully deleted'}, 200
 
 
 ##### [4] TASKS ENDPOINTS ###########################################
@@ -219,15 +221,6 @@ def post_task():
     return make_response(new_task.to_dict(), 201)
 
 
-@task_bp.route("/<task_id>", methods=["DELETE"])
-def delete_one_task(task_id):
-    task = validate_id(task_id, "task")
-    db.session.delete(task)
-    update_total_routine_time(request_body["routine_id"])
-    db.session.commit()
-    return {"message" : f'Task {task_id} successfully deleted'}, 200
-
-
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     task = validate_id(task_id, "task")
@@ -240,4 +233,14 @@ def update_task(task_id):
     db.session.commit()
 
     return jsonify(task.to_dict()), 200
+
+
+@task_bp.route("/<task_id>", methods=["DELETE"])
+def delete_one_task(task_id):
+    task = validate_id(task_id, "task")
+
+    db.session.delete(task)
+    update_total_routine_time(task.routine_id)
+    db.session.commit()
+    return {"details" : f'Task {task_id} successfully deleted'}, 200
 

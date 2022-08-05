@@ -14,14 +14,17 @@ class Routine(db.Model):
 
     def datetime_to_dict(self, dt):
         #For making a dictionary out of a datetime object to make front end simple
-        return {
-            "year":dt.year,
-            "month":dt.month,
-            "day":dt.day,
-            "hour":dt.hour,
-            "minute":dt.minute,
-            "second":dt.second,
-            }
+        if dt:
+            return {
+                "year":dt.year,
+                "month":dt.month,
+                "day":dt.day,
+                "hour":dt.hour,
+                "minute":dt.minute,
+                "second":dt.second,
+                }
+        else:
+            return None
 
     def to_dict(self):
         return {
@@ -30,8 +33,8 @@ class Routine(db.Model):
             "description":self.description,
             "destination": self.destination,
 
-            "complete_time": datetime_to_dict(self.complete_time),
-            "start_time": datetime_to_dict(self.start_time),
+            "complete_time": self.datetime_to_dict(self.complete_time),
+            "start_time": self.datetime_to_dict(self.start_time),
             "total_time":self.total_time,
 
             "tasks":[task.to_dict() for task in self.tasks]
