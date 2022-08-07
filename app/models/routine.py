@@ -9,6 +9,7 @@ class Routine(db.Model):
     complete_time = db.Column(db.DateTime)
     start_time = db.Column(db.DateTime)  #Calculated from complete time
     total_time = db.Column(db.Integer, default=0) #<< number of minutes, calculated
+    initiated_time = db.Column(db.DateTime)
 
     tasks = db.relationship("Task", back_populates="routine", lazy=True)
 
@@ -36,6 +37,7 @@ class Routine(db.Model):
             "complete_time": self.datetime_to_dict(self.complete_time),
             "start_time": self.datetime_to_dict(self.start_time),
             "total_time":self.total_time,
+            "initiated_time":self.initiated_time, #remove this later it's for testing purposes
 
             "tasks":[task.to_dict() for task in self.tasks]
             }
