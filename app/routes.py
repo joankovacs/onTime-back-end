@@ -26,6 +26,75 @@ task_bp = Blueprint('task_bp', __name__, url_prefix='/tasks')
 
 ##### [2] HELPER FUNCTIONS ##########################################
 
+def calculate_start_times(init_time, tasks):
+    '''
+    INPUT: the time the routine initiated; the list of tasks in the routine
+    OUTPUT: a list of datetime objects that correspond to the task list; these
+    objects are when each task should start given init time
+    USED IN: GET Routine initiation special endpoints
+    '''
+    task_minutes = [task.time for task in tasks]
+    task_start_times = []
+    for i in range(len(task_minutes)):
+        total_minutes = sum(task_minutes[:i])
+        task_start_times.append(init_time + datetime.timedelta(minutes=total_minutes))
+    return task_start_times
+
+
+def calculate_task(init_time, tasks):
+    '''
+    INPUT: time the routine initiated, a list of tasks in the routine
+    OUTPUT: the current task given time passed since init
+    USED IN: GET Routine initiation special endpoints
+    '''
+    now = datetime.datetime.today()
+    task_start_times = calculate_start_times(init_time, tasks)
+
+    for task, start_time in zip(tasks, task_start_times):
+        if now > start_time:
+            current_start_time = start_time
+            current_task = task
+
+    return current_task, current_start_time
+
+
+def calculate_progress(task, task_start_time):
+    '''
+    INPUT: the current task at hand (assuming the routine is running), the time the task started
+    OUTPUT: an integer representing the % the task is completed
+    USED IN: GET routine initiation special endpoints
+    '''
+    now = datetime.datetime.today()
+    time_diff = (now - task_start_time).seconds
+
+    task_seconds = datetime.timedelta(minutes=task.time).seconds
+
+    return math.floor((time_diff/task_seconds)*100)
+
+
+def update_task_start_times(routine_id):
+    '''
+    This function is called in endpoints where the complete_time of a routine
+    can change in any way, or the time of any tasks can change in any way.
+    This function is called in update_routine_start_time() and
+    update_total_routine_time(), which makes this function run in the
+    following endpoints:
+        ROUTINE: POST
+        ROUTINE: PUT
+        TASKS: POST
+        TASKS: PUT
+        TASKS: DELETE
+    '''
+    routine = validate_id(routine_id, "routine")
+    if routine.start_time:
+        task_start_times = calculate_start_times(routine.start_time, routine.tasks)
+
+        for i in range(len(routine.tasks)):
+            routine.tasks[i].start_time = task_start_times[i]
+    db.session.commit()
+
+
+
 def validate_id(object_id, object_type):
     '''
     Validates the routine or task based on ID and fetches the object from the database.
@@ -71,6 +140,8 @@ def update_routine_start_time(routine_id):
         routine.start_time = routine.complete_time - time_diff
         db.session.commit()
 
+        update_task_start_times(routine_id)
+
 
 def update_total_routine_time(routine_id):
     '''
@@ -86,6 +157,7 @@ def update_total_routine_time(routine_id):
     update_routine_start_time(routine_id)
 
     db.session.commit()
+
 
 
 def dict_to_datetime(time):
@@ -178,53 +250,7 @@ def delete_routine(routine_id):
     return {"details":f'Routine {routine_id} successfully deleted'}, 200
 
 
-##### [4] INITIATION ENDPOINTS & HELPER FUNCTIONS ###################
-
-def calculate_start_times(init_time, tasks):
-    '''
-    INPUT: the time the routine initiated; the list of tasks in the routine
-    OUTPUT: a list of datetime objects that correspond to the task list; these
-    objects are when each task should start given init time
-    USED IN: GET Routine initiation special endpoints
-    '''
-    task_minutes = [task.time for task in tasks]
-    task_start_times = []
-    for i in range(len(task_minutes)):
-        total_minutes = sum(task_minutes[:i])
-        task_start_times.append(init_time + datetime.timedelta(minutes=total_minutes))
-    return task_start_times
-
-
-def calculate_task(init_time, tasks):
-    '''
-    INPUT: time the routine initiated, a list of tasks in the routine
-    OUTPUT: the current task given time passed since init
-    USED IN: GET Routine initiation special endpoints
-    '''
-    now = datetime.datetime.today()
-    task_start_times = calculate_start_times(init_time, tasks)
-
-    for task, start_time in zip(tasks, task_start_times):
-        if now > start_time:
-            current_start_time = start_time
-            current_task = task
-
-    return current_task, current_start_time
-
-
-def calculate_progress(task, task_start_time):
-    '''
-    INPUT: the current task at hand (assuming the routine is running), the time the task started
-    OUTPUT: an integer representing the % the task is completed
-    USED IN: GET routine initiation special endpoints
-    '''
-    now = datetime.datetime.today()
-    time_diff = (now - task_start_time).seconds
-
-    task_seconds = datetime.timedelta(minutes=task.time).seconds
-
-    return math.floor((time_diff/task_seconds)*100)
-
+##### [4] INITIATION ENDPOINTS ######################################
 
 @routine_bp.route("/init/<routine_id>", methods=["PUT"])
 def initiate_routine(routine_id):
