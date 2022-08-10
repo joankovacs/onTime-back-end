@@ -1,12 +1,18 @@
 from flask import Blueprint, request, jsonify, make_response, abort
-from app import db
-from app.models.routine import Routine
-from app.models.task import Task
+from sqlalchemy import asc
 import datetime
 import math
 
-##### TODO ##########################################################
+from app import db
+from app.models.routine import Routine
+from app.models.task import Task
 
+##### TODO ##########################################################
+'''
+    CURRENT: order routines by datetimes (if possible disregard date!)
+    ?Make position_x, position_y attributes for Task
+    ?Make Task start times return isoformat datetime
+'''
 
 ##### TABLE OF CONTENTS #############################################
 
@@ -94,7 +100,6 @@ def update_task_start_times(routine_id):
     db.session.commit()
 
 
-
 def validate_id(object_id, object_type):
     '''
     Validates the routine or task based on ID and fetches the object from the database.
@@ -159,7 +164,6 @@ def update_total_routine_time(routine_id):
     db.session.commit()
 
 
-
 def iso_to_datetime(iso_time):
     '''
     Given a dict with 5 time fields, this returns a datetime object
@@ -175,7 +179,25 @@ def iso_to_datetime(iso_time):
 @routine_bp.route("", methods=["GET"])
 def get_all_routines():
     routines = Routine.query.all()
-    return jsonify([routine.to_dict() for routine in routines]), 200
+
+    #1 Initialize empty lists for if a routine has a time or no time
+    time_routines = []
+    no_time_routines = []
+
+    #2 Add routines in time_routines by complete_time.time(), else no_time_routines
+    for routine in routines:
+        if routine.complete_time:
+            time_routines.append(routine)
+        else:
+            no_time_routines.append(routine)
+
+    #sort the respective lists and combine them for the return
+    time_routines.sort(key=lambda routine: routine.complete_time.time())
+    no_time_routines.sort(key=lambda routine: routine.routine_id)
+
+    sorted_routines = time_routines + no_time_routines
+
+    return jsonify([routine.to_dict() for routine in sorted_routines]), 200
 
 
 @routine_bp.route("/<routine_id>", methods=["GET"])
@@ -239,6 +261,7 @@ def delete_routine(routine_id):
     db.session.delete(routine)
     db.session.commit()
     return {"details":f'Routine {routine_id} successfully deleted'}, 200
+
 
 
 ##### [4] INITIATION ENDPOINTS ######################################
