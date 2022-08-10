@@ -164,14 +164,26 @@ def update_total_routine_time(routine_id):
     db.session.commit()
 
 
-def iso_to_datetime(iso_time):
+def dict_to_datetime(time):
     '''
     Given a dict with 5 time fields, this returns a datetime object
     This function runs in the following endpoints:
         Routine PUT
         Routine POST
     '''
-    return datetime.fromisoformat(iso_time)
+    now = datetime.datetime.today()
+
+    dt = datetime.datetime(
+        year=now.year,
+        month=now.month,
+        day=now.day,
+        hour=time["hour"],
+        minute=time["minute"]
+    )
+
+
+
+    return dt
 
 
 ##### [3] ROUTINE ENDPOINTS #########################################
@@ -296,7 +308,7 @@ def get_routine_progress(routine_id):
     task_start_times = calculate_start_times(routine.initiated_time, routine.tasks)
     tasks = [task.to_dict() for task in routine.tasks]
     for task, start_time in zip(tasks, task_start_times):
-       task["initiated_time"] = start_time
+       task["initiated_time"] = start_time.isoformat()
 
     #------------------------
 

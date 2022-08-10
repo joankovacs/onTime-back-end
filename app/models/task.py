@@ -11,9 +11,17 @@ class Task(db.Model):
     def datetime_to_clock(self):
         #returns hour and minute from the start_time
         if self.start_time:
+            if self.start_time.hour >= 12:
+                meridiem = "pm"
+                hour_time = self.start_time.hour - 12
+            else:
+                meridiem = "am"
+                hour_time = self.start_time.hour
+
             return {
-                "hour":self.start_time.hour,
-                "minute":self.start_time.minute
+                "hour":hour_time,
+                "minute":self.start_time.minute,
+                "meridiem":meridiem,
                 }
         else:
             return None

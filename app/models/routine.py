@@ -13,10 +13,20 @@ class Routine(db.Model):
 
     tasks = db.relationship("Task", back_populates="routine", lazy=True)
 
-    def datetime_to_iso(self, dt):
+    def datetime_to_dict(self, dt):
         #For making a dictionary out of a datetime object to make front end simple
         if dt:
-            return dt.isoformat()
+            if dt.hour >= 12:
+                meridiem = "pm"
+                hour_time = dt.hour-12
+            else:
+                meridiem = "am"
+                hour_time = dt.hour
+            return {
+                "hour":hour_time,
+                "minute":dt.minute,
+                "meridiem":meridiem,
+            }
         else:
             return None
 
@@ -27,10 +37,10 @@ class Routine(db.Model):
             "description":self.description,
             "destination": self.destination,
 
-            "complete_time": self.datetime_to_iso(self.complete_time),
-            "start_time": self.datetime_to_iso(self.start_time),
+            "complete_time": self.datetime_to_dict(self.complete_time),
+            "start_time": self.datetime_to_dict(self.start_time),
             "total_time":self.total_time,
-            "initiated_time":self.initiated_time, #remove this later it's for testing purposes
+            "initiated_time":self.initiated_time,
 
             "tasks":[task.to_dict() for task in self.tasks]
             }
