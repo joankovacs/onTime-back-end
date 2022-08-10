@@ -160,23 +160,14 @@ def update_total_routine_time(routine_id):
 
 
 
-def dict_to_datetime(time):
+def iso_to_datetime(iso_time):
     '''
     Given a dict with 5 time fields, this returns a datetime object
     This function runs in the following endpoints:
         Routine PUT
         Routine POST
     '''
-    now = datetime.datetime.today()
-
-    time = datetime.datetime(
-        year=now.year,
-        month=now.month,
-        day=now.day,
-        hour=time["hour"],
-        minute=time["minute"]
-    )
-    return time
+    return datetime.fromisoformat(iso_time)
 
 
 ##### [3] ROUTINE ENDPOINTS #########################################
@@ -204,7 +195,7 @@ def post_routine():
         for attribute in attr_list:
             if attribute in request_body:
                 if "complete_time" == attribute:
-                    setattr(new_routine, "complete_time", dict_to_datetime(request_body["complete_time"]))
+                    setattr(new_routine, "complete_time", iso_to_datetime(request_body["complete_time"]))
                 else:
                     setattr(new_routine, attribute, request_body[attribute])
 
@@ -229,7 +220,7 @@ def update_routine(routine_id):
     for key in dict(request_body):
         if key in routine_dict:
             if key == "complete_time":
-                setattr(routine, "complete_time", dict_to_datetime(request_body["complete_time"]))
+                setattr(routine, "complete_time", iso_to_datetime(request_body["complete_time"]))
             else:
                 setattr(routine, key, request_body[key])
 
