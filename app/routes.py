@@ -278,16 +278,43 @@ def initiate_routine(routine_id):
 
 @routine_bp.route("/init/<routine_id>", methods=["GET"])
 def get_routine_progress(routine_id):
+    '''
+    Set up starter variables:
+        1. validated routine
+        2. List of tasks including a new field "initiated_time" (based of off routine.initiated_time)
+            2a. Start times for all tasks
+            2b. Add new dict key for each task in list of tasks
+    Calculate return values:
+        1. Current task, current start time
+        2. Percent remaining
+        3. Completed tasks    { These are calculated based off of current_task
+        4. Incomplete tasks   { /\
+
+    '''
     routine = validate_id(routine_id, "routine")
-    now = datetime.datetime.today()
+
+    task_start_times = calculate_start_times(routine.initiated_time, routine.tasks)
+    tasks = [task.to_dict() for task in routine.tasks]
+    for task, start_time in zip(tasks, task_start_times):
+       task["initiated_time"] = start_time
+
+    #------------------------
 
     current_task, current_start_time = calculate_task(routine.initiated_time, routine.tasks)
 
     percent_remaining = calculate_progress(current_task, current_start_time)
 
+    current_task_index = routine.tasks.index(current_task)
+    completed_tasks = tasks[:current_task_index]
+    incomplete_tasks = tasks[current_task_index:]
+
+    #------------------------
+
     return {
-        "current_task": current_task.title,
+        "current_task": current_task.to_dict(),
         "percent": percent_remaining,
+        "completed_tasks":completed_tasks,
+        "incomplete_tasks":incomplete_tasks,
         }
 
 
