@@ -12,10 +12,10 @@ class Task(db.Model):
         #returns hour and minute from the start_time
         if self.start_time:
             if self.start_time.hour >= 12:
-                meridiem = "pm"
+                meridiem = "PM"
                 hour_time = self.start_time.hour - 12
             else:
-                meridiem = "am"
+                meridiem = "AM"
                 hour_time = self.start_time.hour
 
             return {
