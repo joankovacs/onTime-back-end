@@ -17,10 +17,10 @@ class Routine(db.Model):
         #For making a dictionary out of a datetime object to make front end simple
         if dt:
             if dt.hour >= 12:
-                meridiem = "pm"
+                meridiem = "PM"
                 hour_time = dt.hour-12
             else:
-                meridiem = "am"
+                meridiem = "AM"
                 hour_time = dt.hour
             return {
                 "hour":hour_time,
