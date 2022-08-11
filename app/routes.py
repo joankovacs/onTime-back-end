@@ -181,6 +181,8 @@ def dict_to_datetime(time):
         minute=time["minute"]
     )
 
+
+
     return dt
 
 
@@ -297,8 +299,8 @@ def get_routine_progress(routine_id):
     Calculate return values:
         1. Current task, current start time
         2. Percent remaining
-        3. Completed tasks    { These are calculated based off of current_task
-        4. Incomplete tasks   { /\
+        3. Complete tasks    { These are calculated based off of current_task
+        4. Incomplete tasks   { 
 
     '''
     routine = validate_id(routine_id, "routine")
@@ -306,7 +308,7 @@ def get_routine_progress(routine_id):
     task_start_times = calculate_start_times(routine.initiated_time, routine.tasks)
     tasks = [task.to_dict() for task in routine.tasks]
     for task, start_time in zip(tasks, task_start_times):
-       task["initiated_time"] = start_time.isoformat()
+        task["initiated_time"] = start_time.isoformat()
 
     #------------------------
 
@@ -315,7 +317,7 @@ def get_routine_progress(routine_id):
     percent_remaining = calculate_progress(current_task, current_start_time)
 
     current_task_index = routine.tasks.index(current_task)
-    completed_tasks = tasks[:current_task_index]
+    complete_tasks = tasks[:current_task_index]
     incomplete_tasks = tasks[current_task_index:]
 
     #------------------------
@@ -323,7 +325,7 @@ def get_routine_progress(routine_id):
     return {
         "current_task": current_task.to_dict(),
         "percent": percent_remaining,
-        "completed_tasks":completed_tasks,
+        "complete_tasks":complete_tasks,
         "incomplete_tasks":incomplete_tasks,
         }
 
