@@ -181,8 +181,6 @@ def dict_to_datetime(time):
         minute=time["minute"]
     )
 
-
-
     return dt
 
 
