@@ -227,7 +227,7 @@ def post_routine():
         for attribute in attr_list:
             if attribute in request_body:
                 if "complete_time" == attribute:
-                    setattr(new_routine, "complete_time", iso_to_datetime(request_body["complete_time"]))
+                    setattr(new_routine, "complete_time", dict_to_datetime(request_body["complete_time"]))
                 else:
                     setattr(new_routine, attribute, request_body[attribute])
 
@@ -252,7 +252,7 @@ def update_routine(routine_id):
     for key in dict(request_body):
         if key in routine_dict:
             if key == "complete_time":
-                setattr(routine, "complete_time", iso_to_datetime(request_body["complete_time"]))
+                setattr(routine, "complete_time", dict_to_datetime(request_body["complete_time"]))
             else:
                 setattr(routine, key, request_body[key])
 
