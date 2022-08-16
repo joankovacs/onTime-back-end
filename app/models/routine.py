@@ -16,7 +16,10 @@ class Routine(db.Model):
     def datetime_to_dict(self, dt):
         #For making a dictionary out of a datetime object to make front end simple
         if dt:
-            if dt.hour >= 12:
+            if dt.hour == 12:
+                meridiem = "PM"
+                hour_time = dt.hour
+            elif dt.hour > 12:
                 meridiem = "PM"
                 hour_time = dt.hour-12
             else:
