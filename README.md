@@ -9,7 +9,6 @@ Originally conceptualized as a time management tool for neuro-divergent children
 ## Current Features
 
 - Create new routines and save them for later use
-- Keep a list of favorited tasks for quick access in creating routines
 - Easily modify allotted time for each task and instantly update total routine time
 - Add a "complete by" time to see when to start each task in the routine
 - "Play" a routine to step through each task with the time visualizer tool
