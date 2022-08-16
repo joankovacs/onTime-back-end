@@ -17,4 +17,8 @@ Originally conceptualized as a time management tool for neuro-divergent children
 
 ## Tech Stack
 
-onTime's back-end is written in Python, utilizing Flask and a PostgreSQL database. The front-end is built with React.
+onTime's back-end is written in Python, utilizing Flask and a PostgreSQL database. The front-end is built with React. onTime is deployed to Heroku but is not currently set up for individual download. Stay tuned!
+
+## Authors
+
+onTime was developed by Julie Warren and Joan Kovacs as a capstone project for Cohort 17 of [Ada Developers Academy](https://adadevelopersacademy.org/). 
